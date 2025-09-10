@@ -1,0 +1,121 @@
+
+html, body {
+  width: 100%;
+    height: 100%;
+    display: flex;
+    /* text-align: center; */
+    align-items: center;
+    justify-content: center;
+}
+
+body{font-family:Arial,sans-serif;max-width:640px;margin:auto;padding:1rem}
+    label{display:block;margin:0.6rem 0}
+    input{padding:0.4rem;width:75%}
+    .mic-btn{margin-left:0.4rem;cursor:pointer;font-size:1.2rem}
+    button{margin-top:1rem;padding:0.6rem 1.2rem}
+
+
+/* Conteneur du livre */
+#book {
+    position: relative;
+    width: 600px;
+    height: 400px;
+    margin: 2rem auto;
+    perspective: 1500px;
+  }
+  
+  /* Chaque page */
+  .page {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    background: #fff;
+    border: 1px solid #ccc;
+    box-shadow: 0 4px 8px rgba(0,0,0,.1);
+    transform-origin: left center;
+    transition: transform .6s;
+    backface-visibility: hidden;
+    overflow: hidden;
+    padding: 1.5rem;
+    box-sizing: border-box;
+  }
+  
+  /* Page tournée */
+  .page.flipped {
+    transform: rotateY(-180deg);
+  }
+  
+  /* Couverture */
+  .page.cover {
+    background: #fce5cd;
+    font-weight: bold;
+    text-align: center;
+    font-size: 1.5rem;
+  }
+  
+  .page.morale { background:#fff6e6; font-style:italic; }
+
+  /* conteneur livre + boutons */
+#story-container { position: relative; }
+.nav-btn{
+  position:absolute; top:45%; width:3rem; height:3rem; border:none;
+  background:#fff8; font-size:1.5rem; cursor:pointer; z-index:9999;
+  box-shadow:0 0 4px rgba(0,0,0,.4); border-radius:50%;
+}
+.nav-btn:hover{ background:#fff; }
+.nav-btn:first-of-type{ left:-3.5rem; }
+.nav-btn:last-of-type { right:-3.5rem; }
+
+/* pages déjà tournées = rangées à gauche */
+.page.flipped { transform: rotateY(-180deg); }
+
+/* petite couleur morale */
+.page.morale { background:#fff6e6; font-style:italic; }
+
+/* centrage des boutons de navigation générés par flipbook.js */
+#story-container .nav-btn { display: inline-block; }
+#story-container { text-align: center; }
+#book { margin-left: auto; margin-right: auto; }
+
+.mic-btn.listening {
+  filter: hue-rotate(120deg) brightness(1.1);
+  transform: scale(1.05);
+  transition: transform .15s ease, filter .15s ease;
+}
+/* static/css/generator/flip_book.css */
+#book {
+  width: min(100%, 760px);
+  min-height: 260px;
+  margin: 16px auto;
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  box-shadow: 0 6px 16px rgba(0,0,0,0.06);
+  padding: 16px 20px;
+  text-align: left;
+  line-height: 1.55;
+}
+
+.page {
+  display: none;
+  white-space: pre-wrap;
+}
+
+.page.active {
+  display: block;
+}
+
+.nav {
+  text-align: center;
+  margin-top: 8px;
+}
+
+.nav .nav-btn {
+  display: inline-block;
+  margin: 6px;
+  padding: 8px 12px;
+  border-radius: 8px;
+  border: 1px solid #d1d5db;
+  background: #fff;
+  cursor: pointer;
+}

@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+
+{% block title %}Récapitulatif du panier{% endblock %}
+
+{% block content %}
+<main class="checkout-wrapper">
+
+    <!-- Colonne de gauche -->
+    <div class="cart-section">
+
+        <!-- Moyens de paiement -->
+        <div class="payment-options">
+            <p class="pay">Payez avec :</p>
+            <div class="icons-img">
+                <img src="{{ url_for('static', filename='images/paypal.svg') }}" alt="PayPal" title="PayPal">
+                <img src="{{ url_for('static', filename='images/visa.svg') }}" alt="Visa" title="Visa">
+                <img src="{{ url_for('static', filename='images/mastercard.svg') }}" alt="Mastercard" title="Mastercard">
+                <img src="{{ url_for('static', filename='images/apple_pay.svg') }}" alt="Apple Pay" title="Apple Pay">
+                <img src="{{ url_for('static', filename='images/amazon.svg') }}" alt="Amazon Pay" title="Amazon Pay">
+            </div>
+        </div>
+        
+
+        <!-- Liste des articles -->
+        {% for item in cart_items %}
+        <div class="cart-item">
+            <img src="{{ item.book.book_image_url }}" alt="Livre" width="80">
+            <div class="cart-details">
+                <p class="book-title">{{ item.book.book_title }}</p>
+                <p class="price">{{ item.book.book_price }} €</p>
+                <p class="delivery-estimate">Livraison estimée : 3–5 jours</p>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- Colonne de droite : résumé -->
+    <div class="summary-section">
+        <h2>Récapitulatif</h2>
+
+        <form method="POST" action="{{ url_for('cart_bp.checkout_summary') }}">
+            <div class="email-box">
+                <label for="email">Email de réception :</label>
+                <input type="email" id="email" name="email" value="{{ user.user_email }}" required>
+            </div>
+
+            <div class="order-summary">
+                <p>Sous-total ({{ cart_items|length }} articles) : <span>{{ total_price }} €</span></p>
+                <p>Livraison : <span>5 €</span></p>
+                <p>TVA (20%) : <span>{{ tva }} €</span></p>
+                <hr>
+                <p class="total">Total TTC : <span><strong>{{ total_price + 5 }} €</strong></span></p>
+            </div>
+
+            <div class="promo-box">
+                <input type="text" placeholder="Code promo" name="coupon">
+                <button type="button">Appliquer</button>
+            </div>
+
+            <button type="submit" class="btn primary">✅ Valider et Payer</button>
+        </form>
+    </div>
+
+</main>
+{% endblock %}

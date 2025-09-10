@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- CSS flipbook (vérifie que le fichier existe bien ici) -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/generator/flip_book.css') }}">
+
+  <title>Générateur d'histoires – La Plume des Étoilées</title>
+
+  <style>
+    /* ====== Centrage global ====== */
+    html, body { height: 100%; }
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      background: #f8fafc;
+      display: flex;                 /* centre horizontalement le contenu principal */
+      flex-direction: column;
+      align-items: center;
+    }
+
+    /* conteneur centré avec largeur max */
+    .container {
+      width: min(100%, 960px);
+      padding: 24px 20px 40px;
+      
+    }
+
+    h1 { 
+      margin: 12px 0 16px;
+      text-align: center;            /* titre centré */
+    }
+
+    /* Formulaire centré */
+    form {
+      margin: 0 auto;
+      display: grid;
+      gap: 12px;
+      background: #fff;
+      padding: 16px;
+      border: 1px solid #e5e7eb;
+      border-radius: 12px;
+    }
+    label { display: grid; gap: 6px; font-weight: 600; }
+    input, button {
+      padding: 10px; font-size: 16px; border:1px solid #d1d5db; border-radius:8px;
+    }
+    button { cursor: pointer; background:#111827; color:#fff; border:none; }
+    button:hover { filter: brightness(1.05); }
+    .mic-btn img { vertical-align: middle; }
+
+    /* Zone d’affichage de l’histoire + flipbook centrés */
+    #story-container {
+      margin-top: 16px;
+      min-height: 80px;
+      /* Astuce centrer: */
+      text-align: center;            /* centre les éléments "inline" (les nav-btn) */
+      display: block;
+    }
+    /* Si #book est un bloc classique, margin:auto le centre */
+    #book { margin: 16px auto; }
+
+    /* nav buttons ajoutés par flipbook.js → inline + centrés */
+    #story-container .nav-btn {
+      display: inline-block;
+      margin: 8px 6px;
+      padding: 8px 12px;
+      border-radius: 8px;
+      border: 1px solid #d1d5db;
+      background: #fff;
+      cursor: pointer;
+    }
+
+    /* Liens de téléchargement centrés */
+    .links { margin-top: 12px; text-align: center; }
+    .links a { margin: 0 6px; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Conte animalier personnalisé</h1>
+
+    <form id="story-form">
+      <label>Âge cible
+        <input type="number" id="age" value="6" min="3" max="10" />
+        <span class="mic-btn" data-target="age"><img width="24" height="24" src="https://img.icons8.com/fluency-systems-filled/48/microphone.png" alt="microphone"/></span>
+      </label>
+      <label>Nom du héros
+        <input type="text" id="name" value="Axelle" />
+        <span class="mic-btn" data-target="name"><img width="24" height="24" src="https://img.icons8.com/fluency-systems-filled/48/microphone.png" alt="microphone"/></span>
+      </label>
+      <label>Genre
+        <input type="text" id="genre" value="Conte animalier" />
+        <span class="mic-btn" data-target="genre"><img width="24" height="24" src="https://img.icons8.com/fluency-systems-filled/48/microphone.png" alt="microphone"/></span>
+      </label>
+      <label>Éléments clés
+        <input type="text" id="elements" value="animaux qui parlent, rimes, comptine répétitive" />
+        <span class="mic-btn" data-target="elements"><img width="24" height="24" src="https://img.icons8.com/fluency-systems-filled/48/microphone.png" alt="microphone"/></span>
+      </label>
+      <label>Thèmes
+        <input type="text" id="themes" value="confiance en soi, entraide" />
+        <span class="mic-btn" data-target="themes"><img width="24" height="24" src="https://img.icons8.com/fluency-systems-filled/48/microphone.png" alt="microphone"/></span>
+      </label>
+      <label>Ton souhaité
+        <input type="text" id="tone" value="joyeux et rassurant" />
+        <span class="mic-btn" data-target="tone"><img width="24" height="24" src="https://img.icons8.com/fluency-systems-filled/48/microphone.png" alt="microphone"/></span>
+      </label>
+      <button type="submit">Générer l'histoire</button>
+    </form>
+
+    <div id="story-container"></div>
+  </div>
+
+  <!-- flipbook + speech -->
+  <script src="{{ url_for('static', filename='js/generator/flipbook.js') }}" defer></script>
+  <script src="{{ url_for('static', filename='js/speech.js') }}" defer></script>
+
+  <script>
+  window.addEventListener('DOMContentLoaded', () => {
+    const form = document.getElementById('story-form');
+    const out  = document.getElementById('story-container');
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      out.textContent = 'Génération en cours...';
+
+      const payload = {
+        age: document.getElementById('age').value,
+        name: document.getElementById('name').value,
+        genre: document.getElementById('genre').value,
+        elements: document.getElementById('elements').value,
+        themes: document.getElementById('themes').value,
+        tone: document.getElementById('tone').value
+      };
+
+      try {
+        const r = await fetch('/story/api/generate', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify(payload)
+        });
+        const data = await r.json();
+        if (!r.ok || !data.story) throw new Error(data.error || 'Erreur inconnue');
+
+        // sécuriser le texte
+        const safe = (s) => String(s).replace(/</g,'&lt;').replace(/>/g,'&gt;');
+        const safeStory = safe(data.story);
+
+        // construire le flipbook si dispo
+        if (window.buildBook) {
+          window.buildBook(safeStory);
+        } else {
+          out.innerHTML = `<pre style="white-space:pre-wrap;margin:0 auto;max-width:760px;text-align:left;">${safeStory}</pre>`;
+        }
+
+        // liens de téléchargement centrés
+        const actions = document.createElement('div');
+        actions.className = 'links';
+        actions.innerHTML = `
+          <a href="${data.text_url}" download>⬇️ Télécharger .txt</a>
+          ${data.audio_url ? ` • <a href="${data.audio_url}" download>🎧 Télécharger .mp3</a>` : ''}
+        `;
+        out.appendChild(actions);
+
+      } catch (err) {
+        out.textContent = 'Erreur : ' + err.message;
+      }
+    });
+  });
+  </script>
+</body>
+</html>

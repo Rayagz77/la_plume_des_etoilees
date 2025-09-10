@@ -1,0 +1,84 @@
+{% extends 'base.html' %}
+{% block title %}Mon espace personnel{% endblock %}
+
+{% block content %}
+<div class="outer-wrapper" style="max-width:1100px;margin:24px auto;padding:0 16px;">
+  <div class="main-box" style="display:grid;grid-template-columns:260px 1fr;gap:24px;">
+    
+    <!-- === SIDEBAR === -->
+    <aside class="inner-sidebar" style="background:#fff;border:1px solid #eee;border-radius:16px;padding:16px;">
+      <div class="user-info" style="display:flex;gap:12px;align-items:center;margin-bottom:16px;">
+        <i class="ri-user-3-line" style="font-size:28px;"></i>
+        <div>
+          <h2 style="margin:0 0 4px 0;font-size:18px;">{{ (user.user_firstname or current_user.user_firstname) or 'Utilisateur' }}</h2>
+          <p style="margin:0;color:#666;">{{ (user.user_email or current_user.user_email) or '' }}</p>
+        </div>
+      </div>
+
+      <nav class="nav-links" style="display:grid;gap:8px;">
+        <a href="{{ url_for('account_bp.user_dashboard') }}" style="text-decoration:none;padding:10px 12px;border-radius:10px;border:1px solid #f0f0f0;display:flex;align-items:center;gap:8px;">
+          <i class="ri-shopping-bag-3-line"></i> Commandes
+        </a>
+        <a href="#" style="text-decoration:none;padding:10px 12px;border-radius:10px;border:1px solid #f0f0f0;display:flex;align-items:center;gap:8px;">
+          <i class="ri-user-3-line"></i> Profil
+        </a>
+        <a href="#" style="text-decoration:none;padding:10px 12px;border-radius:10px;border:1px solid #f0f0f0;display:flex;align-items:center;gap:8px;">
+          <i class="ri-lock-2-line"></i> Sécurité
+        </a>
+        <a href="{{ url_for('login_bp.logout') }}" style="text-decoration:none;padding:10px 12px;border-radius:10px;border:1px solid #f0f0f0;display:flex;align-items:center;gap:8px;">
+          <i class="ri-logout-box-line"></i> Déconnexion
+        </a>
+      </nav>
+
+      <div class="cta-upgrade" style="margin-top:16px;background:#f7f7f8;border:1px dashed #ddd;border-radius:12px;padding:12px;text-align:center;">
+        <p style="margin:0 0 8px 0;">Besoin d’un nouveau livre ?</p>
+        <a href="{{ url_for('gallery') }}" class="btn-upgrade" style="display:inline-block;padding:8px 12px;border-radius:10px;background:#111;color:#fff;text-decoration:none;">Voir tous les livres</a>
+      </div>
+    </aside>
+
+    <!-- === SECTION TABLEAU === -->
+    <section class="order-section" style="background:#fff;border:1px solid #eee;border-radius:16px;padding:16px;">
+      <h3 style="margin:0 0 16px 0;">Vos commandes</h3>
+
+      {% if orders and orders|length > 0 %}
+        <table class="orders-table" style="width:100%;border-collapse:collapse;">
+          <thead>
+            <tr>
+              <th style="text-align:left;padding:10px;border-bottom:1px solid #eee;">Commande</th>
+              <th style="text-align:left;padding:10px;border-bottom:1px solid #eee;">Date</th>
+              <th style="text-align:left;padding:10px;border-bottom:1px solid #eee;">Total</th>
+              <th style="text-align:left;padding:10px;border-bottom:1px solid #eee;">Statut</th>
+              <th style="text-align:left;padding:10px;border-bottom:1px solid #eee;">Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for order in orders %}
+              <tr>
+                <td style="padding:10px;border-bottom:1px solid #f3f3f3;">#{{ order.order_id }}</td>
+                <td style="padding:10px;border-bottom:1px solid #f3f3f3;">{{ order.order_date.strftime('%d/%m/%Y') if order.order_date else '' }}</td>
+                <td style="padding:10px;border-bottom:1px solid #f3f3f3;">{{ "%.2f"|format(order.total_price or 0) }} €</td>
+                <td style="padding:10px;border-bottom:1px solid #f3f3f3;">
+                  <span style="padding:4px 8px;border-radius:999px;border:1px solid #e5e7eb;">
+                    {{ (order.payment_status or 'inconnu')|capitalize }}
+                  </span>
+                </td>
+                <td style="padding:10px;border-bottom:1px solid #f3f3f3;">
+                  <a href="{{ url_for('account_bp.order_details', order_id=order.order_id) }}" class="btn-view" style="text-decoration:none;border:1px solid #e5e7eb;border-radius:8px;padding:6px 10px;display:inline-flex;align-items:center;gap:6px;">
+                    <i class="ri-eye-fill"></i> Voir
+                  </a>
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      {% else %}
+        <div style="text-align:center;padding:24px;border:1px dashed #ddd;border-radius:12px;background:#fafafa;">
+          <p style="margin-bottom:12px;">Aucune commande pour le moment.</p>
+          <a href="{{ url_for('gallery') }}" style="display:inline-block;padding:10px 12px;border-radius:10px;background:#111;color:#fff;text-decoration:none;">Découvrir des livres</a>
+        </div>
+      {% endif %}
+    </section>
+
+  </div>
+</div>
+{% endblock %}

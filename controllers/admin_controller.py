@@ -1,0 +1,201 @@
+# controllers/admin_controller.py
+import os
+from flask import Blueprint, request, render_template, redirect, url_for, current_app, flash
+from werkzeug.utils import secure_filename
+
+from controllers.access_management import admin_required
+from models import db
+from models.book_model import Book
+from models.author_model import Author
+from models.category_model import Category
+
+admin_bp = Blueprint('admin_bp', __name__, url_prefix='/admin')
+
+# ---- Dashboard ----
+@admin_bp.route('', methods=['GET'], endpoint='dashboard')  # <-- alias "dashboard"
+@admin_bp.route('/', methods=['GET'])
+@admin_required
+def admin_dashboard():
+    return render_template('admin_dashboard.html')
+
+# ------- Books -------
+@admin_bp.route('/books', methods=['GET'])
+@admin_required
+def list_books():
+    books = Book.query.all()
+    return render_template('list_books.html', books=books)
+
+@admin_bp.route('/add_book', methods=['GET', 'POST'])
+@admin_required
+def add_book():
+    if request.method == 'POST':
+        try:
+            title = request.form['title']
+            publication_date = request.form['publication_date']
+            price = float(request.form['price'])
+            author_id = int(request.form['author_id'])
+            category_id = int(request.form['category_id'])
+
+            image_file = request.files.get('book_image')
+            book_image_url = None
+            if image_file and image_file.filename:
+                filename = secure_filename(image_file.filename)
+                image_path = os.path.join(current_app.root_path, 'static/images', filename)
+                image_file.save(image_path)
+                book_image_url = f'/static/images/{filename}'
+
+            db.session.add(Book(
+                book_title=title,
+                publication_date=publication_date,
+                book_price=price,
+                author_id=author_id,
+                category_id=category_id,
+                book_image_url=book_image_url
+            ))
+            db.session.commit()
+            flash("Livre ajouté.", "success")
+            return redirect(url_for('admin_bp.list_books'))
+        except Exception as e:
+            current_app.logger.error("Erreur lors de l'ajout du livre", exc_info=True)
+            flash("Erreur lors de l'ajout du livre", "danger")
+            return redirect(url_for('admin_bp.add_book'))
+
+    authors = Author.query.all()
+    categories = Category.query.all()
+    return render_template('add_book.html', authors=authors, categories=categories)
+
+@admin_bp.route('/edit_book/<int:book_id>', methods=['GET', 'POST'])
+@admin_required
+def edit_book(book_id):
+    book = Book.query.get(book_id)
+    if not book:
+        return "Livre introuvable", 404
+
+    if request.method == 'POST':
+        book.book_title = request.form['title']
+        book.publication_date = request.form['publication_date']
+        book.book_price = float(request.form['price'])
+        book.author_id = int(request.form['author_id'])
+        book.category_id = int(request.form['category_id'])
+        db.session.commit()
+        flash("Livre modifié.", "success")
+        return redirect(url_for('admin_bp.list_books'))
+
+    authors = Author.query.all()
+    categories = Category.query.all()
+    return render_template('edit_book.html', book=book, authors=authors, categories=categories)
+
+@admin_bp.route('/delete_book/<int:book_id>', methods=['POST'])
+@admin_required
+def delete_book(book_id):
+    book = Book.query.get(book_id)
+    if not book:
+        return "Livre introuvable", 404
+    db.session.delete(book)
+    db.session.commit()
+    flash("Livre supprimé.", "success")
+    return redirect(url_for('admin_bp.list_books'))
+
+# ------- Authors -------
+@admin_bp.route('/authors', methods=['GET'])
+@admin_required
+def list_authors():
+    authors = Author.query.all()
+    return render_template('list_authors.html', authors=authors)
+
+@admin_bp.route('/add_author', methods=['GET', 'POST'])
+@admin_required
+def add_author():
+    if request.method == 'POST':
+        try:
+            author_firstname = request.form['author_firstname']
+            author_lastname = request.form['author_lastname']
+            author_birthday = request.form['author_birthday']
+            db.session.add(Author(
+                author_firstname=author_firstname,
+                author_lastname=author_lastname,
+                author_birthday=author_birthday
+            ))
+            db.session.commit()
+            flash("Auteur ajouté.", "success")
+            return redirect(url_for('admin_bp.list_authors'))
+        except Exception as e:
+            current_app.logger.error("Erreur lors de l'ajout de l'auteur", exc_info=True)
+            flash("Erreur lors de l'ajout de l'auteur", "danger")
+            return redirect(url_for('admin_bp.add_author'))
+    return render_template('add_author.html')
+
+@admin_bp.route('/edit_author/<int:author_id>', methods=['GET', 'POST'])
+@admin_required
+def edit_author(author_id):
+    author = Author.query.get(author_id)
+    if not author:
+        return "Auteur introuvable", 404
+
+    if request.method == 'POST':
+        author.author_firstname = request.form['author_firstname']
+        author.author_lastname = request.form['author_lastname']
+        author.author_birthday = request.form['author_birthday']
+        db.session.commit()
+        flash("Auteur modifié.", "success")
+        return redirect(url_for('admin_bp.list_authors'))
+    return render_template('edit_author.html', author=author)
+
+@admin_bp.route('/delete_author/<int:author_id>', methods=['POST'])
+@admin_required
+def delete_author(author_id):
+    author = Author.query.get(author_id)
+    if not author:
+        return "Auteur introuvable", 404
+    db.session.delete(author)
+    db.session.commit()
+    flash("Auteur supprimé.", "success")
+    return redirect(url_for('admin_bp.list_authors'))
+
+# ------- Categories -------
+@admin_bp.route('/categories', methods=['GET'])
+@admin_required
+def list_categories():
+    categories = Category.query.all()
+    return render_template('list_categories.html', categories=categories)
+
+@admin_bp.route('/add_category', methods=['GET', 'POST'])
+@admin_required
+def add_category():
+    if request.method == 'POST':
+        try:
+            category_name = request.form['category_name']
+            db.session.add(Category(category_name=category_name))
+            db.session.commit()
+            flash("Catégorie ajoutée.", "success")
+            return redirect(url_for('admin_bp.list_categories'))
+        except Exception:
+            current_app.logger.error("Erreur lors de l'ajout de la catégorie", exc_info=True)
+            flash("Erreur lors de l'ajout de la catégorie", "danger")
+            return redirect(url_for('admin_bp.add_category'))
+    return render_template('add_category.html')
+
+@admin_bp.route('/edit_category/<int:category_id>', methods=['GET', 'POST'])
+@admin_required
+def edit_category(category_id):
+    category = Category.query.get(category_id)
+    if not category:
+        return "Catégorie introuvable", 404
+
+    if request.method == 'POST':
+        category.category_name = request.form['category_name']
+        db.session.commit()
+        flash("Catégorie modifiée.", "success")
+        return redirect(url_for('admin_bp.list_categories'))
+    return render_template('edit_category.html', category=category)
+
+@admin_bp.route('/delete_category/<int:category_id>', methods=['POST'])
+@admin_required
+def delete_category(category_id):
+    category = Category.query.get(category_id)
+    if not category:
+        return "Catégorie introuvable", 404
+    db.session.delete(category)
+    db.session.commit()
+    flash("Catégorie supprimée.", "success")
+    return redirect(url_for('admin_bp.list_categories'))

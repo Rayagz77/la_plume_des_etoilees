@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Bienvenue sur mon site de livres{% endblock %}</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <!--=============== REMIXICONS ===============-->
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@3.2.0/fonts/remixicon.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+    <!-- Police Inter (optionnelle) -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+
+    <!--===============base CSS ===============-->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/register.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/gallery.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/cart.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/home.css') }}">
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+
+    <!--=============== HEADER ===============-->
+    <header class="header">
+        <nav class="nav container">
+            <div class="nav__data">
+                <a href="#" class="nav__logo">
+                    <i class="ri-planet-line"></i> Company
+                </a>
+
+                <div class="nav__toggle" id="nav-toggle">
+                    <i class="ri-menu-line nav__burger"></i>
+                    <i class="ri-close-line nav__close"></i>
+                </div>
+            </div>
+
+            <!--=============== NAV MENU ===============-->
+            <div class="nav__menu" id="nav-menu">
+                <ul class="nav__list">
+                    <li><a href="{{ url_for('home') }}" class="nav__link">Accueil</a></li>
+
+                    <li><a href="#" class="nav__link">A propos</a></li>
+
+                    <!--=============== DROPDOWN 1 ===============-->
+                    <li class="dropdown__item">
+                        <div class="nav__link">
+                            Nos livres <i class="ri-arrow-down-s-line dropdown__arrow"></i>
+                        </div>
+
+                        <ul class="dropdown__menu">
+                            <li>
+                                <a href="{{ url_for('gallery') }}" class="dropdown__link">
+                                    <i class="ri-pie-chart-line"></i> Tous les livres
+                                </a>
+                            </li>
+
+                            <li>
+                                <a href="#" class="dropdown__link">
+                                    <i class="ri-arrow-up-down-line"></i> Catégories
+                                </a>
+                            </li>
+
+                            <!--=============== DROPDOWN SUBMENU ===============-->
+                            <li class="dropdown__subitem">
+                                <div class="dropdown__link">
+                                    <i class="ri-bar-chart-line"></i> Reports <i class="ri-add-line dropdown__add"></i>
+                                </div>
+
+                                <ul class="dropdown__submenu">
+                                    <li>
+                                        <a href="#" class="dropdown__sublink">
+                                            <i class="ri-file-list-line"></i> Documents
+                                        </a>
+                                    </li>
+
+                                    <li>
+                                        <a href="#" class="dropdown__sublink">
+                                            <i class="ri-cash-line"></i> Payments
+                                        </a>
+                                    </li>
+
+                                    <li>
+                                        <a href="#" class="dropdown__sublink">
+                                            <i class="ri-refund-2-line"></i> Refunds
+                                        </a>
+                                    </li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </li>
+
+                    <li><a href="#" class="nav__link">Contact</a></li>
+                    {% if current_user.is_authenticated and ((current_user.user_role or '')|lower == 'admin' or current_user.is_admin) %}
+                    <li><a href="{{ url_for('admin_bp.dashboard') }}" class="nav__link">Admin</a></li>
+                    {% endif %}
+
+                    <!--=============== DROPDOWN COMPTE/CONNEXION ===============-->
+                    <li class="dropdown__item">
+                        <div class="nav__link">
+                            {% if current_user.is_authenticated %}
+                                {{ current_user.user_firstname or "Mon compte" }}
+                            {% else %}
+                                Connexion
+                            {% endif %}
+                            <i class="ri-arrow-down-s-line dropdown__arrow"></i>
+                        </div>
+
+                        <ul class="dropdown__menu">
+                            {% if current_user.is_authenticated %}
+                                <li>
+                                    <a href="{{ url_for('account_bp.user_dashboard') }}" class="dropdown__link">
+                                        <i class="ri-user-line"></i> Mon espace
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="{{ url_for('login_bp.logout') }}" class="dropdown__link">
+                                        <i class="ri-logout-box-r-line"></i> Se déconnecter
+                                    </a>
+                                </li>
+                            {% else %}
+                                <li>
+                                    <a href="{{ url_for('login_bp.login') }}" class="dropdown__link">
+                                        <i class="ri-login-box-line"></i> Se connecter
+                                    </a>
+                                </li>
+                            {% endif %}
+                        </ul>
+                    </li>
+
+                    <li><a href="{{ url_for('story.page_generator') }}" class="nav__link">Générer votre histoire</a></li>
+
+                    <li>
+                        <a href="#" class="nav__link" id="cart-link">
+                            Panier {% if cart_count > 0 %}
+                                <span class="cart-count">{{ cart_count }}</span>
+                            {% endif %}
+                        </a>
+                    </li>
+                </ul>
+            </div>
+
+        </nav>
+    </header>
+
+    <!-- Section principale -->
+    <main class="content">
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Pied de page -->
+    <footer class="footer">
+        <div class="container">
+            <!-- Logo -->
+            <div class="footer-logo">
+                <a href="#">
+                    <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Logo" />
+                </a>
+            </div>
+
+            <!-- Menu -->
+            <nav class="footer-nav">
+                <ul class="footer-menu">
+                    <li><a href="#">RGPD</a></li>
+                    <li><a href="#">CGU</a></li>
+                    <li><a href="#">CGV</a></li>
+                    <li><a href="#">Cookies</a></li>
+                    <li><a href="#">Contact</a></li>
+                </ul>
+            </nav>
+
+            <!-- Réseaux sociaux -->
+            <div class="footer-social">
+                <a href="#"><i class="fab fa-facebook-f"></i></a>
+                <a href="#"><i class="fab fa-twitter"></i></a>
+                <a href="#"><i class="fab fa-instagram"></i></a>
+                <a href="#"><i class="fab fa-linkedin-in"></i></a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Fenêtre modale du panier -->
+    <div id="cart-modal" class="cart-modal">
+        <div class="cart-content">
+            <div class="cart-header">
+                <h2>Mon panier</h2>
+                <span class="close-btn">&times;</span>
+            </div>
+
+            <div class="cart-items">
+                {% if cart_items %}
+                    {% for item in cart_items %}
+                        <div class="cart-item">
+                            <img src="{{ item.book.book_image_url }}" alt="{{ item.book.book_title }}" class="cart-item-image">
+                            <div class="cart-item-details">
+                                <p class="cart-item-title">{{ item.book.book_title }}</p>
+                                <p class="cart-item-price">{{ item.book.book_price }} €</p>
+                            </div>
+                            <form action="{{ url_for('cart_bp.remove_from_cart', cart_item_id=item.cart_item_id) }}" method="post">
+                                <button type="submit" class="remove-btn">✖</button>
+                            </form>
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    <p class="empty-cart">Votre panier est vide.</p>
+                {% endif %}
+            </div>
+
+            <div class="cart-footer">
+                <p class="cart-total">Total : <strong>{{ total_price }} €</strong></p>
+                <button id="checkout-btn">Valider mon panier</button>
+            </div>
+        </div>
+    </div>
+
+    <!--=============== MAIN JS ===============-->
+    <script src="{{ url_for('static', filename='js/main.js') }}" defer></script>
+    <script src="{{ url_for('static', filename='js/script.js') }}" defer></script>
+    <script src="{{ url_for('static', filename='js/cart.js') }}" defer></script>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const checkoutBtn = document.getElementById("checkout-btn");
+            if (checkoutBtn) {
+                checkoutBtn.addEventListener("click", function () {
+                    // ✅ Nouvelle redirection vers la page de récapitulatif
+                    window.location.href = "{{ url_for('cart_bp.checkout_summary') }}";
+                });
+            }
+        });
+    </script>
+
+</body>
+</html>

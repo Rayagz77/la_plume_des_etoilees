@@ -1,0 +1,42 @@
+version: "3.9"
+
+services:
+  web:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+    command: >
+      bash -lc "
+        flask db upgrade &&
+        gunicorn --factory app:create_app -w 3 -k gthread -b 0.0.0.0:8000 --timeout 120
+      "
+    env_file:
+      - ./.env.docker
+    environment:
+      FLASK_APP: "app:create_app"
+      PYTHONUNBUFFERED: "1"
+    # 🔑 indispensable sous Linux pour atteindre la DB de l'hôte
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    ports:
+      - "8000:8000"
+    restart: unless-stopped
+
+  db:
+    image: postgres:16-alpine
+    container_name: app_db
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-db_psql_labrary}
+      POSTGRES_USER: ${POSTGRES_USER:-app}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-app}
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    ports:
+      - "5432:5432"
+volumes:
+  db_data:
