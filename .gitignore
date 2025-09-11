@@ -17,3 +17,5 @@ htmlcov/
 .vscode/
 node_modules/
 .env.docker
+.env.local
+*.dump

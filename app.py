@@ -6,7 +6,7 @@ import os, sys
 from urllib.parse import quote_plus
 
 from dotenv import load_dotenv
-from flask import Flask, render_template, request, session
+from flask import Flask, render_template, request
 from flask_login import LoginManager, current_user
 from flask_migrate import Migrate
 
@@ -28,14 +28,32 @@ BASE_DIR = Path(__file__).resolve().parent
 if str(BASE_DIR) not in sys.path:
     sys.path.append(str(BASE_DIR))
 
-# --- Env ---
-# Local : .env ; Docker : env_file dans docker-compose
-load_dotenv(BASE_DIR / ".env", override=True)
+# --- Chargement des variables d'environnement -------------------------------
+# Règles :
+# - En Docker : on NE charge PAS de fichier .env (compose fournit env_file / env).
+# - En local : on tente .env.local (prioritaire), sinon .env.
+APP_ENV = os.getenv("APP_ENV") or ("docker" if os.path.exists("/.dockerenv") else "local")
+os.environ.setdefault("APP_ENV", APP_ENV)
+
+DOTENV_FILE = None
+if APP_ENV != "docker":
+    for name in (".env.local", ".env"):
+        p = BASE_DIR / name
+        if p.exists():
+            try:
+                load_dotenv(p, override=True, encoding="utf-8")
+            except UnicodeDecodeError:
+                # Fallback si le fichier est en ANSI/CP-1252
+                load_dotenv(p, override=True, encoding="latin-1")
+            DOTENV_FILE = str(p)
+            os.environ["DOTENV_FILE"] = DOTENV_FILE
+            break
+# ---------------------------------------------------------------------------
 
 # ---------- DB URI ----------
 DB_USER = os.getenv("DB_USER", "postgres")
 DB_PASSWORD = quote_plus(os.getenv("DB_PASSWORD", ""))
-DB_HOST = os.getenv("DB_HOST", "db")  # "db" en Docker ; "localhost" en local
+DB_HOST = os.getenv("DB_HOST", "db")  # "db" en Docker ; "localhost"/"127.0.0.1" en local
 DB_PORT = os.getenv("DB_PORT", "5432")
 DB_NAME = os.getenv("DB_NAME", "db_psql_labrary")  # <- orthographe confirmée
 
@@ -60,7 +78,7 @@ from controllers.cart_controller import cart_bp  # noqa: E402
 from controllers.payement_controller import payement_bp  # noqa: E402
 from controllers.account_controller import account_bp  # noqa: E402
 
-# ✅ Ton blueprint “story” tel que fourni
+# ✅ Ton blueprint “story”
 from controllers.generateur_controller import bp as story_bp  # noqa: E402
 
 
@@ -74,7 +92,12 @@ def create_app() -> Flask:
         TEMPLATES_AUTO_RELOAD=True,
     )
 
-    # --- Log DB cible pour debug
+    # --- Logs utiles au démarrage
+    app.logger.info(f"APP_ENV={os.getenv('APP_ENV')}")
+    if os.getenv("DOTENV_FILE"):
+        app.logger.info(f"Loaded dotenv: {os.getenv('DOTENV_FILE')}")
+    else:
+        app.logger.info("No dotenv file loaded (Docker or none found).")
     app.logger.info(f"DB target: {app.config['SQLALCHEMY_DATABASE_URI']}")
 
     # --- Extensions
@@ -97,8 +120,8 @@ def create_app() -> Flask:
         app.config.update(
             MAIL_SERVER=os.getenv("MAIL_SERVER", "localhost"),
             MAIL_PORT=int(os.getenv("MAIL_PORT", "25")),
-            MAIL_USE_TLS=os.getenv("MAIL_USE_TLS", "false").lower() == "true",
-            MAIL_USE_SSL=os.getenv("MAIL_USE_SSL", "false").lower() == "true",
+            MAIL_USE_TLS=os.getenv("MAIL_USE_TLS", "false").strip().lower() in {"1", "true", "yes"},
+            MAIL_USE_SSL=os.getenv("MAIL_USE_SSL", "false").strip().lower() in {"1", "true", "yes"},
             MAIL_USERNAME=os.getenv("MAIL_USERNAME"),
             MAIL_PASSWORD=os.getenv("MAIL_PASSWORD"),
             MAIL_DEFAULT_SENDER=os.getenv("MAIL_DEFAULT_SENDER", "no-reply@example.com"),
@@ -143,7 +166,7 @@ def create_app() -> Flask:
     except Exception as e:
         app.logger.info(f"Stripe webhook non chargé: {e}")
 
-    # ---- Contexte templates (panier) — ✅ corrigé
+    # ---- Contexte templates (panier)
     def _ctx_user_id() -> int | None:
         """Retourne l'ID utilisateur, que la PK s'appelle user_id ou id."""
         try:
@@ -171,7 +194,7 @@ def create_app() -> Flask:
                 )
             except Exception as e:
                 app.logger.warning(f"inject_cart_data error: {e}")
-        # Invité : pas de panier persistant (le panier temporaire n'est pas affiché dans le header)
+        # Invité : pas de panier persistant
         return dict(cart_items=[], total_price=0, cart_count=0)
 
     # ---- Routes publiques
