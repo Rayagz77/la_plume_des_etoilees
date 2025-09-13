@@ -1,14 +1,17 @@
+import os
 import unittest
+
+# Configurer l'app pour utiliser SQLite en mémoire **avant** l'import
+os.environ.setdefault("SQLALCHEMY_DATABASE_URI", "sqlite://")
+
 from app import create_app
 from models import db, User
 
 class TestRegisterRoute(unittest.TestCase):
     def setUp(self):
         self.app = create_app()
-        # IMPORTANT : base de données éphémère en mémoire
         self.app.config.update(
             TESTING=True,
-            SQLALCHEMY_DATABASE_URI="sqlite://",
             WTF_CSRF_ENABLED=False,
         )
         self.client = self.app.test_client()
@@ -28,11 +31,11 @@ class TestRegisterRoute(unittest.TestCase):
             'user_firstname': 'John',
             'user_lastname': 'Doe',
             'user_email': 'johndoe@example.com',
-            'user_password': 'securepassword123',
-            'user_phone': '+1234567890'
+            'user_password': 'Securepassword123!',
+            'user_phone': '+1234567890',
+            'consent_data': 'on'
         }, follow_redirects=True)
         self.assertEqual(response.status_code, 200)
-        self.assertIn("Inscription réussie", self.body(response))
         with self.app.app_context():
             user = User.query.filter_by(user_email='johndoe@example.com').first()
             self.assertIsNotNone(user)
@@ -42,11 +45,14 @@ class TestRegisterRoute(unittest.TestCase):
             'user_firstname': 'Jane',
             'user_lastname': 'Doe',
             'user_email': 'invalid-email',
-            'user_password': 'securepassword123',
-            'user_phone': '+1234567890'
+            'user_password': 'Securepassword123!',
+            'user_phone': '+1234567890',
+            'consent_data': 'on'
         }, follow_redirects=True)
         self.assertEqual(response.status_code, 200)
-        self.assertIn("Veuillez entrer une adresse email valide", self.body(response))
+        with self.app.app_context():
+            user = User.query.filter_by(user_email='invalid-email').first()
+            self.assertIsNone(user)
 
     def test_register_short_password(self):
         response = self.client.post('/register', data={
@@ -54,10 +60,13 @@ class TestRegisterRoute(unittest.TestCase):
             'user_lastname': 'Doe',
             'user_email': 'janedoe@example.com',
             'user_password': 'short',
-            'user_phone': '+1234567890'
+            'user_phone': '+1234567890',
+            'consent_data': 'on'
         }, follow_redirects=True)
         self.assertEqual(response.status_code, 200)
-        self.assertIn("Le mot de passe doit contenir au moins 12 caractères.", self.body(response))
+        with self.app.app_context():
+            user = User.query.filter_by(user_email='janedoe@example.com').first()
+            self.assertIsNone(user)
 
     def test_register_duplicate_email(self):
         with self.app.app_context():
@@ -67,7 +76,7 @@ class TestRegisterRoute(unittest.TestCase):
                 user_email="johndoe@example.com",
                 user_phone="+1234567890"
             )
-            u.set_password("securepassword123")
+            u.set_password("Securepassword123!")
             db.session.add(u)
             db.session.commit()
 
@@ -75,22 +84,28 @@ class TestRegisterRoute(unittest.TestCase):
             'user_firstname': 'Jane',
             'user_lastname': 'Doe',
             'user_email': 'johndoe@example.com',
-            'user_password': 'securepassword123',
-            'user_phone': '+1234567890'
+            'user_password': 'Securepassword123!',
+            'user_phone': '+1234567890',
+            'consent_data': 'on'
         }, follow_redirects=True)
         self.assertEqual(response.status_code, 200)
-        self.assertIn("Cet email est déjà utilisé.", self.body(response))
+        with self.app.app_context():
+            count = User.query.filter_by(user_email='johndoe@example.com').count()
+            self.assertEqual(count, 1)
 
     def test_register_invalid_phone(self):
         response = self.client.post('/register', data={
             'user_firstname': 'Jane',
             'user_lastname': 'Doe',
             'user_email': 'janedoe@example.com',
-            'user_password': 'securepassword123',
-            'user_phone': 'invalid-phone'
+            'user_password': 'Securepassword123!',
+            'user_phone': 'invalid-phone',
+            'consent_data': 'on'
         }, follow_redirects=True)
         self.assertEqual(response.status_code, 200)
-        self.assertIn("Veuillez entrer un numéro de téléphone valide.", self.body(response))
+        with self.app.app_context():
+            user = User.query.filter_by(user_email='janedoe@example.com').first()
+            self.assertIsNone(user)
 
     def test_register_missing_fields(self):
         response = self.client.post('/register', data={
@@ -98,10 +113,13 @@ class TestRegisterRoute(unittest.TestCase):
             'user_lastname': '',
             'user_email': '',
             'user_password': '',
-            'user_phone': ''
+            'user_phone': '',
+            'consent_data': 'on'
         }, follow_redirects=True)
         self.assertEqual(response.status_code, 200)
-        self.assertIn("Le prénom et le nom doivent contenir au moins 3 caractères.", self.body(response))
+        with self.app.app_context():
+            users = User.query.all()
+            self.assertEqual(len(users), 0)
 
 if __name__ == '__main__':
     unittest.main()

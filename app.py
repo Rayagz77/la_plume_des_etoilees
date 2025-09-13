@@ -151,7 +151,7 @@ def create_app() -> Flask:
             return None
 
     # ---- Blueprints applicatifs
-    app.register_blueprint(register_bp, url_prefix="/register")
+    app.register_blueprint(register_bp)
     app.register_blueprint(login_bp, url_prefix="/auth")
     app.register_blueprint(admin_bp)   # sans url_prefix (déjà dans le BP)
     app.register_blueprint(cart_bp, url_prefix="/cart")
