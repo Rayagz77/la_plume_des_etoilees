@@ -50,6 +50,7 @@ export DATABASE_URL=sqlite:///db.sqlite3
 # $env:DATABASE_URL="sqlite:///db.sqlite3"
 
 flask db upgrade || echo "No migrations"
+pytest -q || true  # run tests locally
 gunicorn -b 0.0.0.0:8000 "app:create_app()"
 # or for quick dev:
 # flask --app app.py run -p 8000
@@ -58,6 +59,6 @@ gunicorn -b 0.0.0.0:8000 "app:create_app()"
 ## CI/CD
 
 - `.github/workflows/ci.yml` configure Python 3.11, installe les dépendances, lance `pytest` puis construit l'image Docker.
-- `.github/workflows/deploy-railway.yml` déploie sur Railway à chaque `push` sur `main` en utilisant les secrets `RAILWAY_TOKEN` et `RAILWAY_PROJECT_ID`.
+ - `.github/workflows/deploy-railway.yml` se déclenche après un CI réussi sur `main` et déploie sur Railway en utilisant les secrets `RAILWAY_TOKEN` et `RAILWAY_PROJECT_ID`.
 
 Les variables d'environnement Railway suivantes doivent être définies avant déploiement : `APP_ENV`, `FLASK_ENV`, `PORT`, `TZ`, `SECRET_KEY`, `DATABASE_URL`. Consultez `CHECKLIST_preprod.md` pour la liste de vérifications pré-production.
