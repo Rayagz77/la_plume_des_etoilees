@@ -108,6 +108,11 @@ button.btn-delete:hover {
     border: 1px solid #bee5eb;
 }
 
+.message-box{
+    margin: 7px;
+    color: #0e7c56;
+}
+
 @media (max-width: 768px) {
     table {
         font-size: 14px;
