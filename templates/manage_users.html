@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+{% block title %}Gestion des utilisateurs{% endblock %}
+{% block content %}
+<h1>Gestion des utilisateurs</h1>
+<p><a href="{{ url_for('admin_bp.add_user') }}">Ajouter un utilisateur</a></p>
+<table>
+  <thead>
+    <tr><th>Prénom</th><th>Nom</th><th>Email</th><th>Rôle</th><th>Actions</th></tr>
+  </thead>
+  <tbody>
+  {% for u in users %}
+    <tr>
+      <td>{{ u.user_firstname }}</td>
+      <td>{{ u.user_lastname }}</td>
+      <td>{{ u.user_email }}</td>
+      <td>{{ u.user_role }}</td>
+      <td>
+        <a href="{{ url_for('admin_bp.edit_user', user_id=u.user_id) }}">Modifier</a>
+        <a href="{{ url_for('admin_bp.change_user_password', user_id=u.user_id) }}">Mot de passe</a>
+        <form action="{{ url_for('admin_bp.delete_user', user_id=u.user_id) }}" method="post" style="display:inline;">
+          <button type="submit">Supprimer</button>
+        </form>
+      </td>
+    </tr>
+  {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

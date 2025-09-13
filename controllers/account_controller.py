@@ -4,6 +4,7 @@ from __future__ import annotations
 from flask import Blueprint, render_template, redirect, url_for, flash
 from flask_login import login_required, current_user
 
+from models import db
 from models.user_model import User
 from models.order_model import Order
 
@@ -52,3 +53,14 @@ def order_details(order_id: int):
         return redirect(url_for("account_bp.user_dashboard"))
 
     return render_template("order_details.html", order=order)
+
+@account_bp.route('/password', methods=['GET', 'POST'])
+@login_required
+def change_password():
+    user: User = current_user  # type: ignore
+    if request.method == 'POST':
+        user.set_password(request.form['new_password'])
+        db.session.commit()
+        flash('Mot de passe mis à jour.', 'success')
+        return redirect(url_for('account_bp.user_dashboard'))
+    return render_template('change_password.html')

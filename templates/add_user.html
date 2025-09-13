@@ -1,0 +1,13 @@
+{% extends 'base.html' %}
+{% block title %}Ajouter un utilisateur{% endblock %}
+{% block content %}
+<h1>Ajouter un utilisateur</h1>
+<form method="post">
+  <label>Prénom <input name="user_firstname" required></label><br>
+  <label>Nom <input name="user_lastname" required></label><br>
+  <label>Email <input name="user_email" type="email" required></label><br>
+  <label>Rôle <input name="user_role" value="user"></label><br>
+  <label>Mot de passe <input name="user_password" type="password" required></label><br>
+  <button type="submit">Créer</button>
+</form>
+{% endblock %}

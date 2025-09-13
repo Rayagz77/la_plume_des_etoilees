@@ -98,7 +98,7 @@
                         </ul>
                     </li>
 
-                    <li><a href="#" class="nav__link">Contact</a></li>
+                    <li><a href="{{ url_for('pages_bp.contact') }}" class="nav__link">Contact</a></li>
                     {% if current_user.is_authenticated and ((current_user.user_role or '')|lower == 'admin' or current_user.is_admin) %}
                     <li><a href="{{ url_for('admin_bp.dashboard') }}" class="nav__link">Admin</a></li>
                     {% endif %}
@@ -178,11 +178,11 @@
             <!-- Menu -->
             <nav class="footer-nav">
                 <ul class="footer-menu">
-                    <li><a href="#">RGPD</a></li>
-                    <li><a href="#">CGU</a></li>
+                    <li><a href="{{ url_for('pages_bp.privacy') }}">RGPD</a></li>
+                    <li><a href="{{ url_for('pages_bp.terms') }}">CGU</a></li>
                     <li><a href="#">CGV</a></li>
                     <li><a href="#">Cookies</a></li>
-                    <li><a href="#">Contact</a></li>
+                    <li><a href="{{ url_for('pages_bp.contact') }}">Contact</a></li>
                 </ul>
             </nav>
 

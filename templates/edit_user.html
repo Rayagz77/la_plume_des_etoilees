@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+{% block title %}Modifier un utilisateur{% endblock %}
+{% block content %}
+<h1>Modifier un utilisateur</h1>
+<form method="post">
+  <label>Prénom <input name="user_firstname" value="{{ user.user_firstname }}" required></label><br>
+  <label>Nom <input name="user_lastname" value="{{ user.user_lastname }}" required></label><br>
+  <label>Email <input name="user_email" type="email" value="{{ user.user_email }}" required></label><br>
+  <label>Rôle <input name="user_role" value="{{ user.user_role }}"></label><br>
+  <button type="submit">Enregistrer</button>
+</form>
+{% endblock %}
