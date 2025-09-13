@@ -9,7 +9,7 @@
       <div class="auth-left">
         <div class="auth-header">
           <h1>Content de vous revoir</h1>
-          <p>Connectez-vous pour accéder à votre compte</p>
+          <p class="connect-message">Connectez-vous pour accéder à votre compte</p>
         </div>
 
         {% with messages = get_flashed_messages(with_categories=True) %}
@@ -99,6 +99,12 @@
   --gray: #e9ecef;
   --danger: #e53e3e;
   --success: #38a169;
+}
+
+.connect-message{
+  color:#e53e3e;
+  font: 18px;
+  margin-top: 7px;
 }
 .auth-container{min-height:100vh;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#f8f9fa 0%,#e9ecef 100%);padding:2rem;}
 .auth-card{display:flex;width:100%;max-width:1000px;background:white;border-radius:16px;overflow:hidden;box-shadow:0 10px 30px rgba(0,0,0,0.1)}
