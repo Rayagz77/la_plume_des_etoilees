@@ -18,6 +18,14 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/cart.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/home.css') }}">
     {% block extra_css %}{% endblock %}
+    <style>
+    .flash-messages{max-width:600px;margin:1rem auto;padding:0 1rem;}
+    .alert{padding:.75rem 1rem;border-radius:.375rem;margin-bottom:.5rem;}
+    .alert-success{background:#f0fff4;color:#38a169;}
+    .alert-danger{background:#fff5f5;color:#e53e3e;}
+    .alert-warning{background:#fffaf0;color:#d69e2e;}
+    .alert-info{background:#ebf8ff;color:#3182ce;}
+    </style>
 </head>
 <body>
 
@@ -90,7 +98,7 @@
                         </ul>
                     </li>
 
-                    <li><a href="#" class="nav__link">Contact</a></li>
+                    <li><a href="{{ url_for('pages_bp.contact') }}" class="nav__link">Contact</a></li>
                     {% if current_user.is_authenticated and ((current_user.user_role or '')|lower == 'admin' or current_user.is_admin) %}
                     <li><a href="{{ url_for('admin_bp.dashboard') }}" class="nav__link">Admin</a></li>
                     {% endif %}
@@ -145,6 +153,15 @@
 
     <!-- Section principale -->
     <main class="content">
+        {% with messages = get_flashed_messages(with_categories=True) %}
+            {% if messages %}
+                <div class="flash-messages">
+                    {% for category, message in messages %}
+                        <div class="alert alert-{{ category }}">{{ message }}</div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
         {% block content %}{% endblock %}
     </main>
 
@@ -161,11 +178,11 @@
             <!-- Menu -->
             <nav class="footer-nav">
                 <ul class="footer-menu">
-                    <li><a href="#">RGPD</a></li>
-                    <li><a href="#">CGU</a></li>
+                    <li><a href="{{ url_for('pages_bp.privacy') }}">RGPD</a></li>
+                    <li><a href="{{ url_for('pages_bp.terms') }}">CGU</a></li>
                     <li><a href="#">CGV</a></li>
                     <li><a href="#">Cookies</a></li>
-                    <li><a href="#">Contact</a></li>
+                    <li><a href="{{ url_for('pages_bp.contact') }}">Contact</a></li>
                 </ul>
             </nav>
 

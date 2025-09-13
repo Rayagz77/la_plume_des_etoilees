@@ -8,6 +8,7 @@ from models import db
 from models.book_model import Book
 from models.author_model import Author
 from models.category_model import Category
+from models.user_model import User
 
 admin_bp = Blueprint('admin_bp', __name__, url_prefix='/admin')
 
@@ -199,3 +200,61 @@ def delete_category(category_id):
     db.session.commit()
     flash("Catégorie supprimée.", "success")
     return redirect(url_for('admin_bp.list_categories'))
+
+# ------- Users -------
+@admin_bp.route('/users', methods=['GET'])
+@admin_required
+def list_users():
+    users = User.query.all()
+    return render_template('manage_users.html', users=users)
+
+@admin_bp.route('/users/add', methods=['GET', 'POST'])
+@admin_required
+def add_user():
+    if request.method == 'POST':
+        u = User(
+            user_firstname=request.form['user_firstname'],
+            user_lastname=request.form['user_lastname'],
+            user_email=request.form['user_email'],
+            user_role=request.form.get('user_role', 'user')
+        )
+        u.set_password(request.form['user_password'])
+        db.session.add(u)
+        db.session.commit()
+        flash("Utilisateur ajouté.", "success")
+        return redirect(url_for('admin_bp.list_users'))
+    return render_template('add_user.html')
+
+@admin_bp.route('/users/<int:user_id>/edit', methods=['GET', 'POST'])
+@admin_required
+def edit_user(user_id):
+    user = User.query.get_or_404(user_id)
+    if request.method == 'POST':
+        user.user_firstname = request.form['user_firstname']
+        user.user_lastname = request.form['user_lastname']
+        user.user_email = request.form['user_email']
+        user.user_role = request.form.get('user_role', 'user')
+        db.session.commit()
+        flash("Utilisateur modifié.", "success")
+        return redirect(url_for('admin_bp.list_users'))
+    return render_template('edit_user.html', user=user)
+
+@admin_bp.route('/users/<int:user_id>/password', methods=['GET', 'POST'])
+@admin_required
+def change_user_password(user_id):
+    user = User.query.get_or_404(user_id)
+    if request.method == 'POST':
+        user.set_password(request.form['user_password'])
+        db.session.commit()
+        flash("Mot de passe mis à jour.", "success")
+        return redirect(url_for('admin_bp.list_users'))
+    return render_template('change_user_password.html', user=user)
+
+@admin_bp.route('/users/<int:user_id>/delete', methods=['POST'])
+@admin_required
+def delete_user(user_id):
+    user = User.query.get_or_404(user_id)
+    db.session.delete(user)
+    db.session.commit()
+    flash("Utilisateur supprimé.", "success")
+    return redirect(url_for('admin_bp.list_users'))
