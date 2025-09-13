@@ -20,6 +20,16 @@
       </div>
       <input type="text" placeholder="Rechercher un livre..." class="search-input">
     </div>
+
+    {% with messages = get_flashed_messages(with_categories=True) %}
+    {% if messages %}
+    <div class="message-box">
+      {% for category, message in messages %}
+      <div id="welcome" class="alert alert-{{ category }}">{{ message }}</div>
+      {% endfor %}
+    </div>
+    {% endif %}
+    {% endwith %}
     <div class="filter-group">
       <h3 class="filter-title">
         <i class="fa fa-filter"></i> Catégories
