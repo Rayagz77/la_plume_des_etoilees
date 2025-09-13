@@ -118,3 +118,48 @@ button.btn-delete:hover {
         padding: 8px 12px;
     }
 }
+
+/* --- Formulaires CRUD --- */
+form.crud-form {
+    width: 90%;
+    margin: 20px auto;
+    background: #fff;
+    padding: 20px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+}
+
+form.crud-form label {
+    display: block;
+    margin-top: 10px;
+    font-weight: 600;
+}
+
+form.crud-form input,
+form.crud-form select {
+    width: 100%;
+    padding: 8px;
+    margin-top: 4px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+form.crud-form input[type="submit"],
+form.crud-form button {
+    margin-top: 15px;
+    background-color: #093163;
+    color: #fff;
+    border: none;
+    cursor: pointer;
+}
+
+a.btn-back {
+    display: inline-block;
+    margin: 20px;
+    text-decoration: none;
+    color: #093163;
+}
+
+a.btn-back:hover {
+    text-decoration: underline;
+}

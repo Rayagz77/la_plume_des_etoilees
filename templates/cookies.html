@@ -1,0 +1,8 @@
+{% extends 'base.html' %}
+{% block title %}Cookies{% endblock %}
+{% block extra_css %}<link rel="stylesheet" href="{{ url_for('static', filename='css/crud.css') }}">{% endblock %}
+{% block content %}
+<a href="{{ url_for('home') }}" class="btn-back" aria-label="Retour">&larr; Retour</a>
+<h1>Politique de cookies</h1>
+<p>Cette page décrit l'utilisation des cookies sur notre site.</p>
+{% endblock %}

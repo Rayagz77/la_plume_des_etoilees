@@ -79,7 +79,7 @@ document.addEventListener('DOMContentLoaded', () => {
     bars.forEach((bar, idx) => {
       bar.style.background = idx < score ? getStrengthColor(score) : '#e2e8f0';
     });
-    const labels = ['Très faible','Faible','Moyen','Fort','Fort'];
+    const labels = ['Très faible','Faible','Moyen','Moyen','Fort'];
     label.textContent = labels[Math.min(4, score || 0)];
     label.style.color = getStrengthColor(score);
   }
@@ -105,8 +105,9 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function getStrengthColor(score) {
-    const colors = ['#e53e3e', '#dd6b20', '#d69e2e', '#38a169'];
-    return colors[(score || 1) - 1] || '#e2e8f0';
+    if (score >= 4) return '#38a169'; // fort
+    if (score >= 2) return '#ecc94b'; // moyen
+    return '#e53e3e'; // faible
   }
 
   // Écoutes

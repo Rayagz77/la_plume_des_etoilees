@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+{% block title %}Gestion des utilisateurs{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/crud.css') }}">
+{% endblock %}
+
+{% block content %}
+<a href="{{ url_for('admin_bp.dashboard') }}" class="btn-back" aria-label="Retour">&larr; Retour</a>
+<header>
+  <h1>Gestion des utilisateurs</h1>
+  <a href="{{ url_for('admin_bp.add_user') }}" class="btn btn-add" aria-label="Ajouter un utilisateur">Ajouter un utilisateur</a>
+</header>
+
+<table>
+  <thead>
+    <tr><th>Prénom</th><th>Nom</th><th>Email</th><th>Rôle</th><th>Actions</th></tr>
+  </thead>
+  <tbody>
+  {% for u in users %}
+    <tr>
+      <td>{{ u.user_firstname }}</td>
+      <td>{{ u.user_lastname }}</td>
+      <td>{{ u.user_email }}</td>
+      <td>{{ u.user_role }}</td>
+      <td>
+        <a href="{{ url_for('admin_bp.edit_user', user_id=u.user_id) }}" class="btn btn-edit" aria-label="Modifier {{ u.user_firstname }}">Modifier</a>
+        <a href="{{ url_for('admin_bp.change_user_password', user_id=u.user_id) }}" class="btn btn-edit" aria-label="Changer le mot de passe de {{ u.user_firstname }}">Mot de passe</a>
+        <form action="{{ url_for('admin_bp.delete_user', user_id=u.user_id) }}" method="post" style="display:inline;" onsubmit="return confirm('Supprimer cet utilisateur ?');">
+          <button type="submit" class="btn btn-delete" aria-label="Supprimer {{ u.user_firstname }}">Supprimer</button>
+        </form>
+      </td>
+    </tr>
+  {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

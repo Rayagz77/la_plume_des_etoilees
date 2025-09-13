@@ -77,6 +77,7 @@ from controllers.admin_controller import admin_bp  # noqa: E402
 from controllers.cart_controller import cart_bp  # noqa: E402
 from controllers.payement_controller import payement_bp  # noqa: E402
 from controllers.account_controller import account_bp  # noqa: E402
+from controllers.pages_controller import pages_bp  # noqa: E402
 
 # ✅ Ton blueprint “story”
 from controllers.generateur_controller import bp as story_bp  # noqa: E402
@@ -151,13 +152,14 @@ def create_app() -> Flask:
             return None
 
     # ---- Blueprints applicatifs
-    app.register_blueprint(register_bp, url_prefix="/register")
+    app.register_blueprint(register_bp)
     app.register_blueprint(login_bp, url_prefix="/auth")
     app.register_blueprint(admin_bp)   # sans url_prefix (déjà dans le BP)
     app.register_blueprint(cart_bp, url_prefix="/cart")
     app.register_blueprint(payement_bp, url_prefix="/payement")
     app.register_blueprint(account_bp, url_prefix="/account")
     app.register_blueprint(story_bp)  # possède déjà son url_prefix
+    app.register_blueprint(pages_bp)
 
     # Webhook Stripe (facultatif)
     try:
