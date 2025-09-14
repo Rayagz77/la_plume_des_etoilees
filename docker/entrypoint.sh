@@ -10,7 +10,24 @@ fi
 # Si DATABASE_URL est fournie (prod/ci), attendre via cette URL
 if [ -n "${DATABASE_URL}" ]; then
   echo "Waiting for database via DATABASE_URL ..."
-  until pg_isready -d "${DATABASE_URL}"; do sleep 1; done
+  # pg_isready ne comprend pas les schémas dialectaux (ex: postgresql+psycopg2).
+  # On extrait donc hôte/port/base/utilisateur pour appeler pg_isready avec les options.
+  IFS=$'\n' read -r DB_USER DB_PASSWORD DB_HOST DB_PORT DB_NAME <<<"$(python3 <<'PY'
+import os, urllib.parse
+url = os.environ['DATABASE_URL']
+# Normaliser les schémas non supportés par libpq
+url = url.replace('postgresql+psycopg2', 'postgresql').replace('postgres+psycopg2', 'postgresql')
+p = urllib.parse.urlparse(url)
+print(p.username or '')
+print(p.password or '')
+print(p.hostname or '')
+print(p.port or 5432)
+print(p.path.lstrip('/'))
+PY
+)"
+  export PGPASSWORD="${DB_PASSWORD}"
+  until pg_isready -h "${DB_HOST}" -p "${DB_PORT}" -U "${DB_USER}" -d "${DB_NAME}"; do sleep 1; done
+  unset PGPASSWORD
   echo "DB is up (DATABASE_URL)!"
 else
   DB_HOST="${DB_HOST:-${POSTGRES_HOST:-db}}"
