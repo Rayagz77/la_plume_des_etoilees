@@ -10,7 +10,8 @@ This bundle helps you run your Flask app (with `create_app()` in `app.py` at the
 ## 2) Configure environment
 1. Duplicate `.env.example` to `.env` and adjust:
    - `SECRET_KEY` — put any random string.
-   - Keep `POSTGRES_*` as-is unless you want to change them.
+   - `POSTGRES_DB` — default database name `db_psql_library` (adjust if needed).
+   - Keep other `POSTGRES_*` as-is unless you want to change them.
 2. Ensure your app factory exists: `app.py` exposes `create_app()`.
 
 ## 3) Run

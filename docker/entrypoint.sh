@@ -11,7 +11,7 @@ else
   DB_PORT="${DB_PORT:-5432}"
   DB_USER="${DB_USER:-${POSTGRES_USER:-app}}"
   DB_PASSWORD="${DB_PASSWORD:-${POSTGRES_PASSWORD:-app}}"
-  DB_NAME="${DB_NAME:-${POSTGRES_DB:-db_psql_labrary}}"
+  DB_NAME="${DB_NAME:-${POSTGRES_DB:-db_psql_library}}"
   echo "Waiting for database ${DB_NAME} at ${DB_HOST}:${DB_PORT} ..."
   until pg_isready -h "${DB_HOST}" -p "${DB_PORT}" -U "${DB_USER}" -d "${DB_NAME}"; do sleep 1; done
   echo "DB is up!"
