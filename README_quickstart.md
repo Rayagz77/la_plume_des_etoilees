@@ -18,3 +18,6 @@ This bundle helps you run your Flask app (with `create_app()` in `app.py` at the
 ## 3) Run
 ```bash
 docker compose up --build
+```
+
+The entrypoint now extrait les composantes de `DATABASE_URL` (hôte, port, base) avant d'appeler `pg_isready`. Cela permet de gérer les URL telles que `postgresql+psycopg2://` lors de l'attente de la base de données.
