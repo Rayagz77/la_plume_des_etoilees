@@ -12,6 +12,7 @@ This bundle helps you run your Flask app (with `create_app()` in `app.py` at the
    - `SECRET_KEY` — put any random string.
    - Keep `POSTGRES_*` as-is unless you want to change them.
 2. Ensure your app factory exists: `app.py` exposes `create_app()`.
+3. If you run with `APP_ENV=production`, define `DATABASE_URL` or the container will exit.
 
 ## 3) Run
 ```bash
