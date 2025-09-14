@@ -1,12 +1,26 @@
 {% extends 'base.html' %}
 {% block title %}Modifier un utilisateur{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/crud.css') }}">
+{% endblock %}
+
 {% block content %}
+<a href="{{ url_for('admin_bp.manage_users') }}" class="btn-back" aria-label="Retour">&larr; Retour</a>
 <h1>Modifier un utilisateur</h1>
-<form method="post">
-  <label>Prénom <input name="user_firstname" value="{{ user.user_firstname }}" required></label><br>
-  <label>Nom <input name="user_lastname" value="{{ user.user_lastname }}" required></label><br>
-  <label>Email <input name="user_email" type="email" value="{{ user.user_email }}" required></label><br>
-  <label>Rôle <input name="user_role" value="{{ user.user_role }}"></label><br>
+<form method="post" class="crud-form">
+  <label for="user_firstname">Prénom</label>
+  <input id="user_firstname" name="user_firstname" value="{{ user.user_firstname }}" required>
+
+  <label for="user_lastname">Nom</label>
+  <input id="user_lastname" name="user_lastname" value="{{ user.user_lastname }}" required>
+
+  <label for="user_email">Email</label>
+  <input id="user_email" name="user_email" type="email" value="{{ user.user_email }}" required>
+
+  <label for="user_role">Rôle</label>
+  <input id="user_role" name="user_role" value="{{ user.user_role }}">
+
   <button type="submit">Enregistrer</button>
 </form>
 {% endblock %}

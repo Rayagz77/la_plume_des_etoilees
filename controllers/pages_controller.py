@@ -13,3 +13,11 @@ def terms():
 @pages_bp.route('/contact')
 def contact():
     return render_template('contact.html')
+
+@pages_bp.route('/cookies')
+def cookies():
+    return render_template('cookies.html')
+
+@pages_bp.route('/cgv')
+def cgv():
+    return render_template('cgv.html')

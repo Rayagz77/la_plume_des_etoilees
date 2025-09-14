@@ -50,6 +50,9 @@
     button { cursor: pointer; background:#111827; color:#fff; border:none; }
     button:hover { filter: brightness(1.05); }
     .mic-btn img { vertical-align: middle; }
+    .mic-btn { background:none; border:none; padding:0; }
+    .btn-back { display:inline-block;margin-bottom:16px;color:#093163;text-decoration:none; }
+    .btn-back:hover { text-decoration:underline; }
 
     /* Zone d’affichage de l’histoire + flipbook centrés */
     #story-container {
@@ -80,37 +83,38 @@
 </head>
 <body>
   <div class="container">
+    <a href="{{ url_for('home') }}" class="btn-back" aria-label="Retour">&larr; Retour</a>
     <h1>Conte animalier personnalisé</h1>
 
     <form id="story-form">
       <label>Âge cible
         <input type="number" id="age" value="6" min="3" max="10" />
-        <span class="mic-btn" data-target="age"><img width="24" height="24" src="https://img.icons8.com/fluency-systems-filled/48/microphone.png" alt="microphone"/></span>
+        <button type="button" class="mic-btn" data-target="age" aria-label="Dicter l'âge"><img width="24" height="24" src="https://img.icons8.com/fluency-systems-filled/48/microphone.png" alt="Micro"></button>
       </label>
       <label>Nom du héros
         <input type="text" id="name" value="Axelle" />
-        <span class="mic-btn" data-target="name"><img width="24" height="24" src="https://img.icons8.com/fluency-systems-filled/48/microphone.png" alt="microphone"/></span>
+        <button type="button" class="mic-btn" data-target="name" aria-label="Dicter le nom"><img width="24" height="24" src="https://img.icons8.com/fluency-systems-filled/48/microphone.png" alt="Micro"></button>
       </label>
       <label>Genre
         <input type="text" id="genre" value="Conte animalier" />
-        <span class="mic-btn" data-target="genre"><img width="24" height="24" src="https://img.icons8.com/fluency-systems-filled/48/microphone.png" alt="microphone"/></span>
+        <button type="button" class="mic-btn" data-target="genre" aria-label="Dicter le genre"><img width="24" height="24" src="https://img.icons8.com/fluency-systems-filled/48/microphone.png" alt="Micro"></button>
       </label>
       <label>Éléments clés
         <input type="text" id="elements" value="animaux qui parlent, rimes, comptine répétitive" />
-        <span class="mic-btn" data-target="elements"><img width="24" height="24" src="https://img.icons8.com/fluency-systems-filled/48/microphone.png" alt="microphone"/></span>
+        <button type="button" class="mic-btn" data-target="elements" aria-label="Dicter les éléments"><img width="24" height="24" src="https://img.icons8.com/fluency-systems-filled/48/microphone.png" alt="Micro"></button>
       </label>
       <label>Thèmes
         <input type="text" id="themes" value="confiance en soi, entraide" />
-        <span class="mic-btn" data-target="themes"><img width="24" height="24" src="https://img.icons8.com/fluency-systems-filled/48/microphone.png" alt="microphone"/></span>
+        <button type="button" class="mic-btn" data-target="themes" aria-label="Dicter les thèmes"><img width="24" height="24" src="https://img.icons8.com/fluency-systems-filled/48/microphone.png" alt="Micro"></button>
       </label>
       <label>Ton souhaité
         <input type="text" id="tone" value="joyeux et rassurant" />
-        <span class="mic-btn" data-target="tone"><img width="24" height="24" src="https://img.icons8.com/fluency-systems-filled/48/microphone.png" alt="microphone"/></span>
+        <button type="button" class="mic-btn" data-target="tone" aria-label="Dicter le ton"><img width="24" height="24" src="https://img.icons8.com/fluency-systems-filled/48/microphone.png" alt="Micro"></button>
       </label>
       <button type="submit">Générer l'histoire</button>
     </form>
 
-    <div id="story-container"></div>
+    <div id="story-container" aria-live="polite"></div>
   </div>
 
   <!-- flipbook + speech -->

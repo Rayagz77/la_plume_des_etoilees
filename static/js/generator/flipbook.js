@@ -21,7 +21,8 @@ function buildBook(storyText) {
   
     addPage(book, 'Couverture', 'cover');          // page 0   (gauche)
     chapters.forEach(ch => addPage(book, ch));     // pages 1..n
-    const morale = chapters.at(-1).split('\n').pop();
+    const lastChapter = chapters[chapters.length - 1] || '';
+    const morale = lastChapter.split('\n').pop();
     addPage(book, 'Morale :<br>' + morale, 'morale'); // dernière
   
     const pages = [...book.querySelectorAll('.page')];
