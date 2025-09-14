@@ -1,6 +1,12 @@
 #!/usr/bin/env bash
 set -e
 
+# Refuser de démarrer si APP_ENV=production sans DATABASE_URL explicite
+if [ "${APP_ENV}" = "production" ] && [ -z "${DATABASE_URL}" ]; then
+  echo "ERROR: DATABASE_URL must be set when APP_ENV=production" >&2
+  exit 1
+fi
+
 # Si DATABASE_URL est fournie (prod/ci), attendre via cette URL
 if [ -n "${DATABASE_URL}" ]; then
   echo "Waiting for database via DATABASE_URL ..."

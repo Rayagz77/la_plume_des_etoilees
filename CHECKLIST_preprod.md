@@ -5,7 +5,7 @@
 - [ ] PORT assigné
 - [ ] TZ défini
 - [ ] SECRET_KEY défini
-- [ ] DATABASE_URL défini
+- [ ] DATABASE_URL défini (obligatoire si APP_ENV=production)
 - [ ] STRIPE_SECRET_KEY défini (si Stripe est activé)
 - [ ] STRIPE_PUBLIC_KEY défini (si Stripe est activé)
 - [ ] STRIPE_WEBHOOK_SECRET défini (si Stripe est activé)
