@@ -518,6 +518,7 @@ ESPACE PERSO
     display: flex;
     flex-direction: column;
     gap: 1.5rem;
+    margin:50px;
   }
   
   .inner-sidebar .user-info {
@@ -601,6 +602,7 @@ ESPACE PERSO
     box-shadow: 0 4px 20px rgba(140, 126, 232, 0.6);
     border-radius: 20px;
     padding: 50px;
+    margin: 50px;
   }
   
   .section-header h1 {

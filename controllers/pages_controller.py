@@ -21,4 +21,3 @@ def cookies():
 @pages_bp.route('/cgv')
 def cgv():
     return render_template('cgv.html')
-

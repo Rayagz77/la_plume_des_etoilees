@@ -17,4 +17,3 @@ jobs:
           railwayToken: ${{ secrets.RAILWAY_TOKEN }}
           projectId: ${{ secrets.RAILWAY_PROJECT_ID }}
           command: up
-

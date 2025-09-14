@@ -108,6 +108,11 @@ button.btn-delete:hover {
     border: 1px solid #bee5eb;
 }
 
+#welcome{
+  margin-bottom: 20px;
+  color: #328a76;
+}
+
 @media (max-width: 768px) {
     table {
         font-size: 14px;
