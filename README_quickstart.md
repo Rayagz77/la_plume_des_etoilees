@@ -19,5 +19,3 @@ This bundle helps you run your Flask app (with `create_app()` in `app.py` at the
 ```bash
 docker compose up --build
 ```
-
-Once the containers are running, visit [http://localhost:5000](http://localhost:5000) to verify the site starts correctly.
