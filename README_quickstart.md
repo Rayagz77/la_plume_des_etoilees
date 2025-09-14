@@ -18,3 +18,4 @@ This bundle helps you run your Flask app (with `create_app()` in `app.py` at the
 ## 3) Run
 ```bash
 docker compose up --build
+```
