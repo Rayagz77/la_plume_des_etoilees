@@ -107,7 +107,9 @@ def create_app() -> Flask:
 
     # Mongo optionnel
     try:
-        if os.getenv("MONGODB_URI"):
+        mongo_uri = os.getenv("MONGODB_URI") or os.getenv("MONGO_URI")
+        if mongo_uri:
+            app.config["MONGODB_URI"] = mongo_uri
             from extensions import init_mongo  # type: ignore
             init_mongo(app)
         else:
